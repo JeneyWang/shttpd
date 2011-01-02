@@ -278,9 +278,9 @@ static const char *default_extension_map[] = {
     "application/xslt+xml" " xslt",
     "application/zip"      " zip",
     "application/x-tar"    " tar",
-    "application/x-bzip2"  " bz2 boz bz"
+    "application/x-bzip2"  " bz2 boz bz",
     "audio/mpeg"           " mp2 mp3 mpga",
-    "audio/midi"           " midi mid";
+    "audio/midi"           " midi mid",
     "image/gif"            " gif",
     "image/jpeg"           " jpeg jpe jpg",
     "image/png"            " png",
