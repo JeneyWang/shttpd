@@ -977,7 +977,11 @@ static void usage(void)
     "\t--pidfile filename (default: no pidfile)\n"
     "\t\tWrite PID to the specified file.  Note that if you are\n"
     "\t\tusing --chroot, then the pidfile must be relative to,\n"
-    "\t\tand inside the wwwroot.\n"
+    "\t\tand inside the wwwroot."
+    "\n");
+    printf(
+    "\t--help \n"
+    "\t\tprints this dialogue.\n"
     "\n");
 #ifdef __FreeBSD__
     printf(
@@ -1012,24 +1016,25 @@ static void parse_commandline(const int argc, char *argv[])
 {
     int i;
 
-    if ((argc < 2) || (argc == 2 && strcmp(argv[1], "--help") == 0))
-    {
-        usage(); /* no wwwroot given */
-        exit(EXIT_FAILURE);
-    }
-    if (strcmp(argv[1], "--version") == 0)
-    {
-        printf("%s "
-#ifdef NDEBUG
-        "-debug"
-#else
-        "+debug"
-#endif
-        "\n", rcsid);
-        exit(EXIT_FAILURE);
-    }
 
-    wwwroot = xstrdup(argv[1]);
+    if(argc == 2 && strcmp(argv[1], "--help") == 0) {
+            usage();
+            exit(EXIT_FAILURE);
+    }
+    if (argc == 2 && strcmp(argv[1], "--version") == 0) { 
+            printf("%s \n", rcsid);
+            exit(EXIT_FAILURE);
+    }
+    
+    if (argc < 2) {
+    wwwroot = getcwd(NULL, PATH_MAX);
+    } 
+    else {
+    wwwroot = xstrdup(argv[1]); 
+    } 
+    
+    puts(wwwroot);
+    
     /* Strip ending slash. */
     if (wwwroot[strlen(wwwroot)-1] == '/') wwwroot[strlen(wwwroot)-1] = '\0';
 

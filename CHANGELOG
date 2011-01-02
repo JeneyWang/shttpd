@@ -1,0 +1,9 @@
+# changes made since fork
+
+01-01-2011: fork starts officially, shttpd is the decided name for "simple http daemon"
+01-02-2011: CHANGELOG: CHANGELOG created, format should be M-D-YEAR: MESSAGE
+01-02-2011: --help returns usage();
+01-02-2011: when used with no arguments defaults wwwroot directory the CWD
+
+
+
