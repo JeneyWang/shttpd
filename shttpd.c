@@ -923,13 +923,8 @@ static void usage(void)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Returns 1 if string is a number, 0 otherwise.  Set num to NULL if
- * disinterested in value.
- */
-static int str_to_num(const char *str, int *num)
-{
+//Returns 1 if string is a number, 0 otherwise.  Set num to NULL if disinterested in value.
+static int str_to_num(const char *str, int *num) {
     char *endptr;
     long l = strtol(str, &endptr, 10);
     if (*endptr != '\0') return 0;
@@ -939,14 +934,9 @@ static int str_to_num(const char *str, int *num)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Parses commandline options.
- */
-static void parse_commandline(const int argc, char *argv[])
-{
+//Parses commandline options.
+static void parse_commandline(const int argc, char *argv[]) {
     int i;
-
 
     if(argc == 2 && strcmp(argv[1], "--help") == 0) {
             usage();
@@ -1097,10 +1087,7 @@ static struct connection *new_connection(void)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Accept a connection from sockin and add it to the connection queue.
- */
+//Accept a connection from sockin and add it to the connection queue.
 static void accept_connection(void)
 {
     struct sockaddr_in addrin;
@@ -1133,14 +1120,11 @@ static void accept_connection(void)
 }
 
 
-
 static void log_connection(const struct connection *conn);
 
-/* ---------------------------------------------------------------------------
- * Log a connection, then cleanly deallocate its internals.
- */
-static void free_connection(struct connection *conn)
-{
+
+// Log a connection, then cleanly deallocate its internals.
+static void free_connection(struct connection *conn) {
     if (debug) printf("free_connection(%d)\n", conn->socket);
     log_connection(conn);
     if (conn->socket != -1) xclose(conn->socket);
@@ -1156,12 +1140,8 @@ static void free_connection(struct connection *conn)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Recycle a finished connection for HTTP/1.1 Keep-Alive.
- */
-static void recycle_connection(struct connection *conn)
-{
+// Recycle a finished connection for HTTP/1.1 Keep-Alive.
+static void recycle_connection(struct connection *conn) {
     int socket_tmp = conn->socket;
     if (debug) printf("recycle_connection(%d)\n", socket_tmp);
     conn->socket = -1; /* so free_connection() doesn't close it */
@@ -1193,15 +1173,13 @@ static void recycle_connection(struct connection *conn)
     conn->reply_length = 0;
     conn->reply_sent = 0;
     conn->total_sent = 0;
-
+    
     conn->state = RECV_REQUEST; /* ready for another */
 }
 
 
 
-/* ---------------------------------------------------------------------------
- * Uppercasify all characters in a string of given length.
- */
+// Uppercasify all characters in a string of given length.
 static void strntoupper(char *str, const size_t length)
 {
     size_t i;
