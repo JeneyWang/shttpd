@@ -278,7 +278,7 @@ static const char *default_extension_map[] = {
     "application/xslt+xml" " xslt",
     "application/zip"      " zip",
     "application/x-tar"    " tar",
-    "application/x-bzip2"  " bz2 boz bz",
+    "application/x-bzip2"  " bz2 boz bz"
     "audio/mpeg"           " mp2 mp3 mpga",
     "audio/midi"           " midi mid",
     "image/gif"            " gif",
@@ -2691,7 +2691,7 @@ main(int argc, char **argv)
                 (unsigned int)(r.ru_stime.tv_usec/10000)
         );
         printf("Requests: %u\n", num_requests);
-        printf("Bytes: %llu in, %llu out\n", total_in, total_out);
+        printf("%lu KB in, %lu KB out\n", total_in/1024, total_out/1024);
     }
 
     return (0);
