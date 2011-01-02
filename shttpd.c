@@ -217,8 +217,6 @@ struct connection
     unsigned int total_sent; /* header + body = total, for logging */
 };
 
-
-
 struct mime_mapping
 {
     char *extension, *mimetype;
@@ -227,7 +225,6 @@ struct mime_mapping
 struct mime_mapping *mime_map = NULL;
 size_t mime_map_size = 0;
 size_t longest_ext = 0;
-
 
 
 /* If a connection is idle for idletime seconds or more, it gets closed and
@@ -296,8 +293,6 @@ static const char *default_extension_map[] = {
 
 static const char default_mimetype[] = "application/octet-stream";
 
-
-
 /* Connection or Keep-Alive field, depending on conn_close. */
 #define keep_alive(conn) ((conn)->conn_close ? \
     "Connection: close\r\n" : keep_alive_field)
@@ -306,7 +301,6 @@ static const char default_mimetype[] = "application/octet-stream";
 static void poll_recv_request(struct connection *conn);
 static void poll_send_header(struct connection *conn);
 static void poll_send_reply(struct connection *conn);
-
 
 
 /* ---------------------------------------------------------------------------
@@ -328,8 +322,6 @@ static void *xmalloc(const size_t size)
     if (ptr == NULL) errx(1, "can't allocate %u bytes", size);
     return ptr;
 }
-
-
 
 /* ---------------------------------------------------------------------------
  * realloc() that errx()s if it can't allocate.
