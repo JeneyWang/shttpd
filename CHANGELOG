@@ -6,6 +6,8 @@
 01-02-2011: darkhttpd.c: when used with no arguments defaults wwwroot directory the CWD
 01-02-2011: AUTHORS: updated with Calvin Morrison
 01-02-2011: Makefile: added -O2 -Wall to CFLAGS, removed nonexisting files from clean function
+01-02-2011: darkhttpd.c renamed shttpd.c, rebranded at Version 0.1 
+01-02-2011: Makefile: updated to shttpd/shttpd.c
 
 
 
