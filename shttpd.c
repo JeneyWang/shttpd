@@ -277,14 +277,17 @@ static const char *default_extension_map[] = {
     "application/xml-dtd"  " dtd",
     "application/xslt+xml" " xslt",
     "application/zip"      " zip",
+    "application/x-tar"    " tar",
+    "application/x-bzip2"  " bz2 boz bz"
     "audio/mpeg"           " mp2 mp3 mpga",
+    "audio/midi"           " midi mid";
     "image/gif"            " gif",
     "image/jpeg"           " jpeg jpe jpg",
     "image/png"            " png",
     "text/css"             " css",
     "text/html"            " html htm",
     "text/javascript"      " js",
-    "text/plain"           " txt asc",
+    "text/plain"           " txt asc h c",
     "video/mpeg"           " mpeg mpe mpg",
     "video/quicktime"      " qt mov",
     "video/x-msvideo"      " avi",
