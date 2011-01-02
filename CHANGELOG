@@ -9,5 +9,7 @@
 01-02-2011: darkhttpd.c renamed shttpd.c, rebranded at Version 0.1 
 01-02-2011: Makefile: replaced darkhttpd with shttpd/shttpd.c
 01-02-2011: shttpd.c: more mimetype mappings added to original list
+01-02-2011: shttpd.c: main(), fixed %llu to %lu for correct data type
+01-02-2011: shttpd.c: total in/out is now in Kilobytes instead of Bytes (simple / 1024) 
 
 

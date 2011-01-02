@@ -227,13 +227,6 @@ size_t mime_map_size = 0;
 size_t longest_ext = 0;
 
 
-/* If a connection is idle for idletime seconds or more, it gets closed and
- * removed from the connlist.  Set to 0 to remove the timeout
- * functionality.
- */
-static int idletime = 60;
-static char *keep_alive_field = NULL;
-
 /* Time is cached in the event loop to avoid making an excessive number of
  * gettimeofday() calls.
  */
@@ -245,8 +238,9 @@ static time_t now;
 #define MAX_REQUEST_LENGTH 4000
 
 
-
 /* Defaults can be overridden on the command-line */
+static int idletime = 60; /*idle time before timeout*/
+static char *keep_alive_field = NULL;
 static in_addr_t bindaddr = INADDR_ANY;
 static unsigned short bindport = 80;
 static int max_connections = -1;        /* kern.ipc.somaxconn */
@@ -309,33 +303,29 @@ static void poll_send_reply(struct connection *conn);
 /* ---------------------------------------------------------------------------
  * close that dies on error.
  */
-static void xclose(const int fd)
-{
+static void xclose(const int fd) {
     if (close(fd) == -1) err(1, "close()");
 }
-
 
 
 /* ---------------------------------------------------------------------------
  * malloc that errx()s if it can't allocate.
  */
-static void *xmalloc(const size_t size)
-{
+static void *xmalloc(const size_t size) {
     void *ptr = malloc(size);
     if (ptr == NULL) errx(1, "can't allocate %u bytes", size);
     return ptr;
 }
 
+
 /* ---------------------------------------------------------------------------
  * realloc() that errx()s if it can't allocate.
  */
-static void *xrealloc(void *original, const size_t size)
-{
+static void *xrealloc(void *original, const size_t size) {
     void *ptr = realloc(original, size);
     if (ptr == NULL) errx(1, "can't reallocate %u bytes", size);
     return ptr;
 }
-
 
 
 /* ---------------------------------------------------------------------------
@@ -351,7 +341,6 @@ static char *xstrdup(const char *src)
 }
 
 
-
 #ifdef __sun /* unimpressed by Solaris */
 static int vasprintf(char **strp, const char *fmt, va_list ap)
 {
@@ -364,10 +353,7 @@ static int vasprintf(char **strp, const char *fmt, va_list ap)
 #endif
 
 
-
-/* ---------------------------------------------------------------------------
- * vasprintf() that errx()s if it fails.
- */
+// vasprintf() that errx()s if it fails.
 static unsigned int xvasprintf(char **ret, const char *format, va_list ap)
 {
     int len = vasprintf(ret, format, ap);
@@ -376,10 +362,7 @@ static unsigned int xvasprintf(char **ret, const char *format, va_list ap)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * asprintf() that errx()s if it fails.
- */
+// asprintf() that errx()s if it fails.
 static unsigned int xasprintf(char **ret, const char *format, ...)
 {
     va_list va;
@@ -390,7 +373,6 @@ static unsigned int xasprintf(char **ret, const char *format, ...)
     va_end(va);
     return len;
 }
-
 
 
 /* ---------------------------------------------------------------------------
@@ -406,7 +388,6 @@ struct apbuf
 };
 
 
-
 static struct apbuf *make_apbuf(void)
 {
     struct apbuf *buf = xmalloc(sizeof(struct apbuf));
@@ -415,7 +396,6 @@ static struct apbuf *make_apbuf(void)
     buf->str = xmalloc(buf->pool);
     return buf;
 }
-
 
 
 static void appendl(struct apbuf *buf, const char *s, const size_t len)
@@ -432,7 +412,6 @@ static void appendl(struct apbuf *buf, const char *s, const size_t len)
 }
 
 
-
 #ifdef __GNUC__
 #define append(buf, s) appendl(buf, s, \
     (__builtin_constant_p(s) ? sizeof(s)-1 : strlen(s)) )
@@ -442,7 +421,6 @@ static void append(struct apbuf *buf, const char *s)
     appendl(buf, s, strlen(s));
 }
 #endif
-
 
 
 static void appendf(struct apbuf *buf, const char *format, ...)
@@ -460,10 +438,7 @@ static void appendf(struct apbuf *buf, const char *format, ...)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Make the specified socket non-blocking.
- */
+// Make the specified socket non-blocking.
 static void
 nonblock_socket(const int sock)
 {
@@ -478,9 +453,7 @@ nonblock_socket(const int sock)
 
 
 
-/* ---------------------------------------------------------------------------
- * Split string out of src with range [left:right-1]
- */
+//Split string out of src with range [left:right-1]
 static char *split_string(const char *src,
     const size_t left, const size_t right)
 {
@@ -497,10 +470,7 @@ static char *split_string(const char *src,
 
 
 
-/* ---------------------------------------------------------------------------
- * Consolidate slashes in-place by shifting parts of the string over repeated
- * slashes.
- */
+// Consolidate slashes in-place by shifting parts of the string over repeated slashes.
 static void consolidate_slashes(char *s)
 {
     size_t left = 0, right = 0;
@@ -529,11 +499,8 @@ static void consolidate_slashes(char *s)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Resolve /./ and /../ in a URI, in-place.  Returns NULL if the URI is
- * invalid/unsafe, or the original buffer if successful.
- */
+// Resolve /./ and /../ in a URI, in-place.  Returns NULL if the URI is
+//invalid/unsafe, or the original buffer if successful.
 static char *make_safe_uri(char *uri)
 {
     struct {
@@ -609,11 +576,8 @@ static char *make_safe_uri(char *uri)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Associates an extension with a mimetype in the mime_map.  Entries are in
- * unsorted order.  Makes copies of extension and mimetype strings.
- */
+// Associates an extension with a mimetype in the mime_map.  Entries are in
+// unsorted order.  Makes copies of extension and mimetype strings.
 static void add_mime_mapping(const char *extension, const char *mimetype)
 {
     size_t i;
@@ -642,11 +606,7 @@ static void add_mime_mapping(const char *extension, const char *mimetype)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * qsort() the mime_map.  The map must be sorted before it can be searched
- * through.
- */
+//qsort() the mime_map.  The map must be sorted before it can be searched through.
 static int mime_mapping_cmp(const void *a, const void *b)
 {
     return strcmp( ((const struct mime_mapping *)a)->extension,
@@ -661,9 +621,7 @@ static void sort_mime_map(void)
 
 
 
-/* ---------------------------------------------------------------------------
- * Parses a mime.types line and adds the parsed data to the mime_map.
- */
+//Parses a mime.types line and adds the parsed data to the mime_map.
 static void parse_mimetype_line(const char *line)
 {
     unsigned int pad, bound1, lbound, rbound;
@@ -711,18 +669,13 @@ static void parse_mimetype_line(const char *line)
 
 
 
-/* ---------------------------------------------------------------------------
- * Adds contents of default_extension_map[] to mime_map list.  The array must
- * be NULL terminated.
- */
-static void parse_default_extension_map(void)
-{
+//Adds contents of default_extension_map[] to mime_map list.  The array must be NULL terminated
+static void parse_default_extension_map(void) {
     int i;
 
     for (i=0; default_extension_map[i] != NULL; i++)
         parse_mimetype_line(default_extension_map[i]);
 }
-
 
 
 /* ---------------------------------------------------------------------------
@@ -733,8 +686,7 @@ static void parse_default_extension_map(void)
  * already at EOF, returns NULL.  Will err() or errx() in case of
  * unexpected file error or running out of memory.
  */
-static char *read_line(FILE *fp)
-{
+static char *read_line(FILE *fp) {
    char *buf;
    long startpos, endpos;
    size_t linelen, numread;
@@ -779,10 +731,7 @@ static char *read_line(FILE *fp)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Removes the ending newline in a string, if there is one.
- */
+//Removes the ending newline in a string, if there is one.
 static void chomp(char *str)
 {
    size_t len = strlen(str);
@@ -791,12 +740,8 @@ static void chomp(char *str)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Adds contents of specified file to mime_map list.
- */
-static void parse_extension_map_file(const char *filename)
-{
+//Adds contents of specified file to mime_map list.
+static void parse_extension_map_file(const char *filename) {
     char *buf;
     FILE *fp = fopen(filename, "rb");
     if (fp == NULL) err(1, "fopen(\"%s\")", filename);
@@ -813,20 +758,16 @@ static void parse_extension_map_file(const char *filename)
 
 
 
-/* ---------------------------------------------------------------------------
- * Uses the mime_map to determine a Content-Type: for a requested URI.  This
- * bsearch()es mime_map, so make sure it's sorted first.
- */
-static int mime_mapping_cmp_str(const void *a, const void *b)
-{
+//Uses the mime_map to determine a Content-Type: for a requested URI.  This
+//bsearch()es mime_map, so make sure it's sorted first.
+static int mime_mapping_cmp_str(const void *a, const void *b) {
     return strcmp(
         (const char *)a,
         ((const struct mime_mapping *)b)->extension
     );
 }
 
-static const char *uri_content_type(const char *uri)
-{
+static const char *uri_content_type(const char *uri) {
     size_t period, urilen = strlen(uri);
 
     for (period=urilen-1;
@@ -853,11 +794,7 @@ static const char *uri_content_type(const char *uri)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Initialize the sockin global.  This is the socket that we accept
- * connections from.
- */
+//Initialize the sockin global.  This is the socket that we accept connections from.
 static void init_sockin(void)
 {
     struct sockaddr_in addrin;
@@ -924,10 +861,7 @@ static void init_sockin(void)
 }
 
 
-
-/* ---------------------------------------------------------------------------
- * Prints a usage statement.
- */
+ //Prints  usage statement.
 static void usage(void)
 {
     printf("\n"
