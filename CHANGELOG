@@ -1,9 +1,11 @@
 # changes made since fork
 
 01-01-2011: fork starts officially, shttpd is the decided name for "simple http daemon"
-01-02-2011: CHANGELOG: CHANGELOG created, format should be M-D-YEAR: MESSAGE
-01-02-2011: --help returns usage();
-01-02-2011: when used with no arguments defaults wwwroot directory the CWD
+01-02-2011: CHANGELOG: CHANGELOG created, format should be M-D-YEAR: FILE: MESSAGE
+01-02-2011: darkhttpd.c:  --help returns usage();
+01-02-2011: darkhttpd.c: when used with no arguments defaults wwwroot directory the CWD
+01-02-2011: AUTHORS: updated with Calvin Morrison
+01-02-2011: Makefile: added -O2 -Wall to CFLAGS, removed nonexisting files from clean function
 
 
 
