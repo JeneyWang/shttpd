@@ -313,7 +313,7 @@ static void xclose(const int fd) {
  */
 static void *xmalloc(const size_t size) {
     void *ptr = malloc(size);
-    if (ptr == NULL) errx(1, "can't allocate %u bytes", size);
+    if (ptr == NULL) errx(1, "can't allocate %lu bytes", size);
     return ptr;
 }
 
@@ -323,7 +323,7 @@ static void *xmalloc(const size_t size) {
  */
 static void *xrealloc(void *original, const size_t size) {
     void *ptr = realloc(original, size);
-    if (ptr == NULL) errx(1, "can't reallocate %u bytes", size);
+    if (ptr == NULL) errx(1, "can't reallocate %lu bytes", size);
     return ptr;
 }
 
@@ -719,7 +719,7 @@ static char *read_line(FILE *fp) {
    if (fseek(fp, startpos, SEEK_SET) == -1) err(1, "fseek()");
    numread = fread(buf, 1, linelen, fp);
    if (numread != linelen)
-      errx(1, "fread() %u bytes, expecting %u bytes", numread, linelen);
+      errx(1, "fread() %lu bytes, expecting %lu bytes", numread, linelen);
 
    /* terminate buffer */
    buf[linelen] = 0;
@@ -1610,7 +1610,7 @@ static void cleanup_sorted_dirlist(struct dlent **list, const ssize_t size)
 static int needs_urlencoding(unsigned char c)
 {
     int i;
-    const static char bad[] = "<>\"%{}|^~[]`\\;:/?@#=&";
+    static const char bad[] = "<>\"%{}|^~[]`\\;:/?@#=&";
 
     for (i=0; i<sizeof(bad)-1; i++)
         if (c == bad[i])
@@ -1626,9 +1626,9 @@ static int needs_urlencoding(unsigned char c)
 /* ---------------------------------------------------------------------------
  * Encode filename to be an rfc1738-compliant URL part
  */
-static void urlencode_filename(unsigned char *name, unsigned char *safe_url)
+static void urlencode_filename( char *name, char *safe_url)
 {
-    const static char hex[] = "0123456789ABCDEF";
+    static const char hex[] = "0123456789ABCDEF";
     int i, j;
 
     for (i = j = 0; name[i] != '\0'; i++)

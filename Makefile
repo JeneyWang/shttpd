@@ -1,13 +1,13 @@
 CC=cc
-CFLAGS=-O2 -Wall
+CFLAGS=-O2 -Wall -Wextra
 LIBS=`[ \`uname\` = "SunOS" ] && echo -lsocket -lnsl`
 TARGETS = bsd linux solaris
 .PHONY: all $(TARGETS)
 
-all: darkhttpd
+all: shttpd
 
-darkhttpd: darkhttpd.c
-	$(CC) $(CFLAGS) $(LIBS) darkhttpd.c -o $@
+darkhttpd: shttpd.c
+	$(CC) $(CFLAGS) $(LIBS) shttpd.c -o $@
 
 clean:
-	rm -f darkhttpd
+	rm -f shttpd
